@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Code Highlighting</title>
+  <link rel="stylesheet" type="text/css" href="../build/highlight.min.css">
+  <style type="text/css">
+  body{
+    overflow-x: auto;
+    padding: 1em;
+  }
+  #codeHighlightTest{
+    height: 30em;
+    width: 27em;
+    float: left;
+    padding: 1em;
+    margin-right: 1em;
+    line-height: 1.5em;
+  }
+  #container_0{
+    float: left;
+    margin-right: 1em;
+    width: 28em;
+  }
+  #container_1{
+    float: left;
+    width: 28em;
+  }
+  </style>
+</head>
+<body>
+  <div style="width:90em;overflow:hidden;">
+    <ol id="container_0"></ol>
+    <textarea id="codeHighlightTest">
+// 敲敲试试哈。。。代码高亮改进
+// P.S. 没有对注释过多判断
+/*
+ 左代码使用默认的li作为行
+ 需要给ol或ul作为container
+ 且代码来自中间的textarea
+*/
+/*
+ 右代码使用自定义div作为行
+ 且代码来自script标签
+ IE下不好使，IE将script的内容压成一行了。。
+*/
+var txt = S.$("codeHighlightTest");
+var container = S.$("container");
+var codes = new Highlight(txt);
+codes.line().render(container);
+var inputing = 0;
+S.on(txt, "keyup", function(evt) {
+  clearTimeout(inputing);
+  inputing = setTimeout(function() {
+    codes.update();
+  }, 100)
+});
+// 1. 字符串：红色
+"Hehe to Death && \"HelloWorld\""
+'Hehe to Death && \'HelloWorld\''
+// 2. 关键字：蓝色
+var str0 = new String();
+// 3. JS方法（定义或调用，函数表达式不处理）：黄色
+function Hehe() {}
+Hehe();
+// 4. JS对象：绿色
+S.on(txt, "keyup", function(evt) {})
+// 5. JS属性：粉色
+S.str.trim();
+S.utils.ani.animate()
+    </textarea>
+    <div id="container_1"></div>
+    <br style="clear:both;" />
+  </div>
+</body>
+<script type="text/javascript" src="../build/highlight.min.js"></script>
+<script type="text/javascript" src="../src/base.js"></script>
+<script type="text/javascript" id="test">
+var txt = S.$("codeHighlightTest");
+var container_0 = S.$("container_0");
+var container_1 = S.$("container_1");
+var codes_0 = new Highlight(txt);
+codes_0.line().render(container_0);
+var codes_1 = new Highlight(S.$("test"), {
+  "container": container_1,
+  "indent": 2,
+  "codeType": "js"
+})
+codes_1.line("<div class=\"line\">${code}</div>").render();
+var inputing = 0;
+S.on(txt, "keyup", function(evt) {
+  clearTimeout(inputing);
+  inputing = setTimeout(function() {
+    codes_0.update();
+  }, 100)
+})
+</script>
+</html>
