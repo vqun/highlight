@@ -4,9 +4,9 @@ An easy tool for code highlight.
 
 Files
 ==========
-###1. src/highlight.js/build/highlight.min.js: Main file
-###2. src/highlight.css/build/highlight.min.css: 代码高亮要用到的样式表
-###3. src/base.js: 请忽略，只是demo里要用所以随便加进来的
+#####1. src/highlight.js/build/highlight.min.js: Main file
+#####2. src/highlight.css/build/highlight.min.css: 代码高亮要用到的样式表
+#####3. src/base.js: 请忽略，只是demo里要用所以随便加进来的
 ---
 
 API
