@@ -1,6 +1,6 @@
 (function(C){
   C.HConfig = {
-    "javascript": {
+    "js": {
       "keywords": []
     },
     "css": {
@@ -16,8 +16,8 @@
 })(this);
 (function(C, undefined) {
   var KEYWORDS_REG = "",
-      STRING_REG = /("|')([^\1]*?(?:(?:\\\\)*(?:\\"|\\')?)*[^\1]*?)*?\1/gm, // 字符串匹配(虽然可以多行，但是，不会判断相应语言的多行字符串的格式)
-      COMMENT_REG = /(\/\*([^*]|[\r\n]|(\*+([^(?:\*\/)]|[\r\n])))*\*+\/)|(\/\/.*)/;
+      STRING_REG = /("|')((?:[^\1]*?(?:(?:\\\\)*(?:\\"|\\')?)*[^\1]*?)*?)\1/gm, // 字符串匹配(虽然可以多行，但是，不会判断相应语言的多行字符串的格式)
+      COMMENT_REG = /(?:\/\*(?:[^*]|[\r\n]|(?:\*+(?:[^(?:\*\/)]|[\r\n])))*\*+\/)|(?:\/\/.*)/gm;
   var CODE_TYPE = {"js":1, "css":1, "html":1}
   var HIGHLIGHT_LINE_TMPL = "<li class=\"line\">${code}</li>";
   C.Highlight = Highlight;
@@ -42,21 +42,18 @@
     _code = this.code(coder);
     _code = htmlEncode(_code);
     indent = indent || this.indent;
-    var _indent = "";
-    for(var k = 0;k<indent;k++) {
-      _indent += "\u00A0"
-    }
-    _code = _code.replace(/\s*$/g, "");
-    _code = _code.replace(/\t/gm, _indent);
-    if(codeType === "js") {
-      _code = this.jsHighlight(_code)
-    }else if(codeType === "css") {
-      _code = this.cssHighlight(_code)
-    }else if(codeType === "html") {
-      _code = this.htmlHighlight(_code)
-    }
+
+    // create indent number of space(\u00A0)
+    var _indent = new Array(indent+1).join("\u00A0");
+
+    // del the space on the tail and replace the tab to indent
+    _code = _code.replace(/\s*$/g, "").replace(/\t/gm, _indent);
+
+    _code = this.compile(_code);
+
+    // split with \n|\r as lines
     _codes = _code.split(/\n|\r/gm);
-    // 删除最后一个空行
+    // del the last one space line
     var lastLine = _codes[_codes.length-1];
     if(/^\s+$/.test(lastLine) || !lastLine) {
       _codes.pop();
@@ -64,10 +61,13 @@
     this.codes = _codes;
     return this
   }
+  // get code string from coder
   Highlight.prototype.code = function(coder) {
     if(!coder) {
       return ""
     }
+    if(coder + "" == coder)
+      return "" + coder;
     var _code = "";
     if(coder.nodeType == 1) {
       var tag = coder.tagName.toLowerCase();
@@ -78,6 +78,70 @@
       }
     }
     return _code
+  }
+  Highlight.prototype.compile = function compile(code) {
+    // 1. String
+    // 2. Comment
+    // var t = "/*";var b ="*/"
+    var ret = [], codeType = this.codeType;
+    var str, cmmnt, _code = this.codes, str_idx, cmmnt_idx, str_len, cmmnt_len, s_i, c_i, idx = 0;
+    while ((str = STRING_REG.exec(_code)) && (cmmnt = COMMENT_REG.exec(_code))){
+      strinfo();
+      cmmntinfo();
+      if(str_idx < cmmnt_idx && s_i > c_i){
+        // string in comment
+        buildComment();
+        STRING_REG.lastIndex = cmmnt_idx;
+      }else{
+        // comment in string
+        buildString();
+        COMMENT_REG.lastIndex = str_idx;
+      }
+    }
+    if(str){
+      strinfo();
+      buildString();
+      while(str = STRING_REG.exec(_code)){
+        strinfo();
+        buildString()
+      }
+    }
+    if(cmmnt){
+      cmmntinfo();
+      buildComment();
+      while(cmmnt = COMMENT_REG.exec(_code)){
+        cmmntinfo();
+        buildComment()
+      }
+    }
+    ret.push(buildKW(_code.slice(idx)));
+    return ret.join("");
+    function strinfo() {
+      str_idx = STRING_REG.lastIndex;
+      str_len = str[2].split("").length;
+      s_i = str_idx - str_len;
+    }
+    function buildString() {
+      ret.push(buildKW(_code.slice(idx, s_i-1)));
+      ret.push("<i class=\"string\">" + str[2] + "</i>");
+      idx = str_idx - 1;
+    }
+    function cmmntinfo() {
+      cmmnt_idx = COMMENT_REG.lastIndex;
+      cmmnt_len = cmmnt[0].split("").length;
+      c_i = cmmnt_idx - cmmnt_len;
+    }
+    function buildComment() {
+      ret.push(buildKW(_code.slice(idx, c_i-1)));
+      ret.push("<i class=\"jsComment\">" + cmmnt[0] + "</i>");
+      idx = cmmnt_idx;
+    }
+    function buildKW(codes) {
+      var cfg, keywords = (cfg = C.HConfig[codeType]) && cfg.keywords || [];
+      for(var k = keywords.length; k--;)
+        codes = codes.replace(new RegExp("("+keywords[k]+")", "gm"), "<i class=\"keyword\">$1</i>");
+      return codes
+    }
   }
   Highlight.prototype.jsHighlight = function(_code) {
     // 1. 字符串高亮

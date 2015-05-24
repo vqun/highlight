@@ -72,6 +72,8 @@ S.utils.ani.animate()
     <div id="container_1"></div>
     <br style="clear:both;" />
   </div>
+
+  <div id="v2_container"></div>
 </body>
 <script type="text/javascript" src="../build/highlight.min.js"></script>
 <script type="text/javascript" src="../src/base.js"></script>
@@ -93,6 +95,109 @@ S.on(txt, "keyup", function(evt) {
   inputing = setTimeout(function() {
     codes_0.update();
   }, 100)
-})
+});
+
+
+</script>
+
+<script type="text/javascript" id="v2_demo">
+  (function(C){
+    C.HConfig = {
+      "js": {
+        "keywords": ["var", "console", "function", "Function", "{", "}"]
+      },
+      "css": {
+        "keywords": []
+      },
+      "html": {
+        "keywords": []
+      },
+      "config": {
+        "codeType": ["js", "css", "html"]
+      }
+    }
+  })(this);
+  function compile() {
+    var KEYWORDS_REG = "",
+      STRING_REG = /("|')((?:[^\1]*?(?:(?:\\\\)*(?:\\"|\\')?)*[^\1]*?)*?)\1/gm,
+      COMMENT_REG = /(?:\/\*(?:[^*]|[\r\n]|(?:\*+(?:[^(?:\*\/)]|[\r\n])))*\*+\/)|(?:\/\/.*)/gm;
+    // 1. String
+    // 2. Comment
+    // var t = "/*";var b ="*/"
+    var ret = [];
+    var str, cmmnt, _code = this.codes, str_idx, cmmnt_idx, str_len, cmmnt_len, s_i, c_i, idx = 0;
+    while ((str = STRING_REG.exec(_code)) && (cmmnt = COMMENT_REG.exec(_code))){
+      strinfo();
+      cmmntinfo();
+      if(str_idx < cmmnt_idx && s_i > c_i){
+        // string in comment
+        buildComment();
+        STRING_REG.lastIndex = cmmnt_idx;
+      }else{
+        // comment in string
+        buildString();
+        COMMENT_REG.lastIndex = str_idx;
+      }
+    }
+    if(str){
+      strinfo();
+      buildString();
+      while(str = STRING_REG.exec(_code)){
+        strinfo();
+        buildString()
+      }
+    }
+    if(cmmnt){
+      cmmntinfo();
+      buildComment();
+      while(cmmnt = COMMENT_REG.exec(_code)){
+        cmmntinfo();
+        buildComment()
+      }
+    }
+    ret.push(buildKW(_code.slice(idx)));
+    return ret.join("");
+    function strinfo() {
+      str_idx = STRING_REG.lastIndex;
+      str_len = str[2].split("").length;
+      s_i = str_idx - str_len;
+    }
+    function buildString() {
+      ret.push(buildKW(_code.slice(idx, s_i-1)));
+      ret.push("<i class=\"string\">" + str[2] + "</i>");
+      idx = str_idx - 1;
+    }
+    function cmmntinfo() {
+      cmmnt_idx = COMMENT_REG.lastIndex;
+      cmmnt_len = cmmnt[0].split("").length;
+      c_i = cmmnt_idx - cmmnt_len;
+    }
+    function buildComment() {
+      ret.push(buildKW(_code.slice(idx, c_i-1)));
+      ret.push("<i class=\"jsComment\">" + cmmnt[0] + "</i>");
+      idx = cmmnt_idx;
+    }
+    function buildKW(codes) {
+      var cfg, keywords = (cfg = HConfig["js"]) && cfg.keywords || [];
+      for(var k = keywords.length; k--;)
+        codes = codes.replace(new RegExp("("+keywords[k]+")", "gm"), "<i class=\"keyword\">$1</i>");
+      return codes
+    }
+  }
+
+  var codes = compile.call({
+    "codes": (function() {
+      /*
+       * test: "string in comment"
+       */
+      var t = "test: /*comment in string*/";
+      var a = "test: /*", b = "test: */";
+      console.log("test")
+    }).toString()
+  });
+  console.log(codes)
+  var con = document.getElementById("v2_container");
+  con.className = "codeHighlight";
+  con.innerHTML = codes;
 </script>
 </html>
