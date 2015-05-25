@@ -1,10 +1,1 @@
-/*
- *@name     highlight
- *@version  v0.1.0
- *@desc     An Easy Tool For Code Highlight.
- *@author   VeeQun
- *@license  MIT
- *@modified 2014-10-26
- */
-
-.codeHighlight{font-size:15px;margin:0;padding:0 0 1px;border:.1em solid #eee;line-height:1.5em}.codeHighlight i{font-style:normal;font-weight:700}.codeHighlight .jsComment{color:#aaa}.codeHighlight .keyword{color:#0909cf}.codeHighlight .string{color:#e00e0e}.codeHighlight .object{color:green}.codeHighlight .property{color:#e9647b}.codeHighlight .method{color:#ff8f00}.codeHighlight .arguments{color:#c0f}.codeHighlight .line{cursor:default;padding:.1em 0 .1em .2em;counter-increment:codeLineNum;margin:0 0 0 2em;list-style:none;position:relative}.codeHighlight .line::before{content:counter(codeLineNum);background-color:#faf7f7;width:1.7em;position:absolute;display:inline-block;top:0;left:-2em;text-align:right;padding:.2em .2em .2em 0;border-right:.15em solid #56F319}.codeHighlight .line:hover{background-color:rgba(244,244,244,.8)}.codeHighlight pre{margin:0;word-break:break-word;word-wrap:break-word;width:100%}
+.codeHighlight{margin:0;padding:0 0 1px 0;border:.1em solid #eee;font-size:15px;line-height:1.5em}.codeHighlight i{font-weight:bold;font-style:normal}.codeHighlight .comment{color:#aaa}.codeHighlight .keyword{color:#0909cf}.codeHighlight .string{color:#ff9494}.codeHighlight .line{position:relative;margin:0 0 0 2em;padding:.1em 0 .1em .2em;list-style:none;counter-increment:codeLineNum;cursor:default}.codeHighlight .line::before{position:absolute;top:0;left:-2em;display:inline-block;padding:.2em .2em .2em 0;width:1.7em;border-right:.15em solid #56f319;background-color:#faf7f7;content:counter(codeLineNum);text-align:right}.codeHighlight .line:hover{background-color:rgba(244,244,244,.8)}.codeHighlight pre{margin:0;width:100%;word-wrap:break-word;word-break:break-word}

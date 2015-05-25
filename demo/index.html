@@ -1,8 +1,8 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Code Highlighting</title>
+  <title>Highlight.v2 Test</title>
   <link rel="stylesheet" type="text/css" href="../build/highlight.min.css">
   <style type="text/css">
   body{
@@ -32,172 +32,55 @@
   <div style="width:90em;overflow:hidden;">
     <ol id="container_0"></ol>
     <textarea id="codeHighlightTest">
-// 敲敲试试哈。。。代码高亮改进
-// P.S. 没有对注释过多判断
+// test: Single-line Comments
 /*
- 左代码使用默认的li作为行
- 需要给ol或ul作为container
- 且代码来自中间的textarea
+ * test: Multi-line Comments
 */
+// test: "String in Single-line Comments"
 /*
- 右代码使用自定义div作为行
- 且代码来自script标签
- IE下不好使，IE将script的内容压成一行了。。
-*/
-var txt = S.$("codeHighlightTest");
-var container = S.$("container");
-var codes = new Highlight(txt);
-codes.line().render(container);
-var inputing = 0;
-S.on(txt, "keyup", function(evt) {
-  clearTimeout(inputing);
-  inputing = setTimeout(function() {
-    codes.update();
-  }, 100)
-});
+ * test: "String in Single-line Comments"
+ */
+var str0 = "test: String";
+var commentsInStr = "/*test: Multi-line Comments in string*/";
 // 1. 字符串：红色
 "Hehe to Death && \"HelloWorld\""
 'Hehe to Death && \'HelloWorld\''
 // 2. 关键字：蓝色
-var str0 = new String();
-// 3. JS方法（定义或调用，函数表达式不处理）：黄色
-function Hehe() {}
-Hehe();
-// 4. JS对象：绿色
-S.on(txt, "keyup", function(evt) {})
-// 5. JS属性：粉色
-S.str.trim();
-S.utils.ani.animate()
+var str1 = new String("test: Keywords");
+// test: var t = function(){console.log("keywords in Single-line Comment")}
+/*
+ * test: var t = function(){
+ *   console.log("keywords in Multi-line Comments")
+ * }
+ */
+function test() {
+  var a  = function() {}
+}
     </textarea>
     <div id="container_1"></div>
     <br style="clear:both;" />
   </div>
-
-  <div id="v2_container"></div>
 </body>
 <script type="text/javascript" src="../build/highlight.min.js"></script>
-<script type="text/javascript" src="../src/base.js"></script>
-<script type="text/javascript" id="test">
-var txt = S.$("codeHighlightTest");
-var container_0 = S.$("container_0");
-var container_1 = S.$("container_1");
-var codes_0 = new Highlight(txt);
-codes_0.line().render(container_0);
-var codes_1 = new Highlight(S.$("test"), {
-  "container": container_1,
-  "indent": 2,
-  "codeType": "js"
-})
-codes_1.line("<div class=\"line\">${code}</div>").render();
-var inputing = 0;
-S.on(txt, "keyup", function(evt) {
-  clearTimeout(inputing);
-  inputing = setTimeout(function() {
-    codes_0.update();
-  }, 100)
-});
-
-
-</script>
-
-<script type="text/javascript" id="v2_demo">
-  (function(C){
-    C.HConfig = {
-      "js": {
-        "keywords": ["var", "console", "function", "Function", "{", "}"]
-      },
-      "css": {
-        "keywords": []
-      },
-      "html": {
-        "keywords": []
-      },
-      "config": {
-        "codeType": ["js", "css", "html"]
-      }
-    }
-  })(this);
-  function compile() {
-    var KEYWORDS_REG = "",
-      STRING_REG = /("|')((?:[^\1]*?(?:(?:\\\\)*(?:\\"|\\')?)*[^\1]*?)*?)\1/gm,
-      COMMENT_REG = /(?:\/\*(?:[^*]|[\r\n]|(?:\*+(?:[^(?:\*\/)]|[\r\n])))*\*+\/)|(?:\/\/.*)/gm;
-    // 1. String
-    // 2. Comment
-    // var t = "/*";var b ="*/"
-    var ret = [];
-    var str, cmmnt, _code = this.codes, str_idx, cmmnt_idx, str_len, cmmnt_len, s_i, c_i, idx = 0;
-    while ((str = STRING_REG.exec(_code)) && (cmmnt = COMMENT_REG.exec(_code))){
-      strinfo();
-      cmmntinfo();
-      if(str_idx < cmmnt_idx && s_i > c_i){
-        // string in comment
-        buildComment();
-        STRING_REG.lastIndex = cmmnt_idx;
-      }else{
-        // comment in string
-        buildString();
-        COMMENT_REG.lastIndex = str_idx;
-      }
-    }
-    if(str){
-      strinfo();
-      buildString();
-      while(str = STRING_REG.exec(_code)){
-        strinfo();
-        buildString()
-      }
-    }
-    if(cmmnt){
-      cmmntinfo();
-      buildComment();
-      while(cmmnt = COMMENT_REG.exec(_code)){
-        cmmntinfo();
-        buildComment()
-      }
-    }
-    ret.push(buildKW(_code.slice(idx)));
-    return ret.join("");
-    function strinfo() {
-      str_idx = STRING_REG.lastIndex;
-      str_len = str[2].split("").length;
-      s_i = str_idx - str_len;
-    }
-    function buildString() {
-      ret.push(buildKW(_code.slice(idx, s_i-1)));
-      ret.push("<i class=\"string\">" + str[2] + "</i>");
-      idx = str_idx - 1;
-    }
-    function cmmntinfo() {
-      cmmnt_idx = COMMENT_REG.lastIndex;
-      cmmnt_len = cmmnt[0].split("").length;
-      c_i = cmmnt_idx - cmmnt_len;
-    }
-    function buildComment() {
-      ret.push(buildKW(_code.slice(idx, c_i-1)));
-      ret.push("<i class=\"jsComment\">" + cmmnt[0] + "</i>");
-      idx = cmmnt_idx;
-    }
-    function buildKW(codes) {
-      var cfg, keywords = (cfg = HConfig["js"]) && cfg.keywords || [];
-      for(var k = keywords.length; k--;)
-        codes = codes.replace(new RegExp("("+keywords[k]+")", "gm"), "<i class=\"keyword\">$1</i>");
-      return codes
-    }
-  }
-
-  var codes = compile.call({
-    "codes": (function() {
-      /*
-       * test: "string in comment"
-       */
-      var t = "test: /*comment in string*/";
-      var a = "test: /*", b = "test: */";
-      console.log("test")
-    }).toString()
+<script type="text/javascript">
+  var coder = document.getElementById("codeHighlightTest"),
+    con0 = document.getElementById("container_0"),
+    con1 = document.getElementById("container_1");
+  var codes_0 = new Highlight(coder, {
+    "container": con0,
+    "indent": 2
   });
-  console.log(codes)
-  var con = document.getElementById("v2_container");
-  con.className = "codeHighlight";
-  con.innerHTML = codes;
+  var codes_1 = new Highlight(coder, {
+    "container": con1,
+    "indent": 4,
+    "tmpl": "<div class=\"line\">${code}</div>"
+  });
+  var inputing;
+  coder.onkeyup = function(evt) {
+    clearTimeout(inputing);
+    inputing = setTimeout(function() {
+      codes_0.update();
+    }, 100)
+  }
 </script>
 </html>
