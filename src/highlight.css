@@ -9,26 +9,14 @@
 	font-style: normal;
 	font-weight: bold;
 }
-.codeHighlight .jsComment{
+.codeHighlight .comment{
 	color: #aaa;
 }
 .codeHighlight .keyword{
 	color: rgb(9, 9, 207);
 }
 .codeHighlight .string{
-	color: rgb(224, 14, 14);
-}
-.codeHighlight .object{
-	color: green;
-}
-.codeHighlight .property{
-	color: rgb(233, 100, 123);
-}
-.codeHighlight .method{
-	color: rgb(255, 143, 0);
-}
-.codeHighlight .arguments{
-	color: rgb(204, 0, 255);
+	color: #FF9494;
 }
 .codeHighlight .line{
 	cursor: default;
