@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Highlight.v2 Test</title>
+  <title>Highlight Test</title>
   <link rel="stylesheet" type="text/css" href="../build/highlight.min.css">
   <style type="text/css">
   body{
@@ -32,6 +32,7 @@
   <div style="width:90em;overflow:hidden;">
     <ol id="container_0"></ol>
     <textarea id="codeHighlightTest">
+// 来来来，在这里敲敲代码玩玩哈。。
 // test: Single-line Comments
 /*
  * test: Multi-line Comments
@@ -61,7 +62,7 @@ function test() {
     <br style="clear:both;" />
   </div>
 </body>
-<script type="text/javascript" src="../build/highlight.min.js"></script>
+<script type="text/javascript" src="../src/highlight.js"></script>
 <script type="text/javascript">
   var coder = document.getElementById("codeHighlightTest"),
     con0 = document.getElementById("container_0"),
@@ -80,6 +81,7 @@ function test() {
     clearTimeout(inputing);
     inputing = setTimeout(function() {
       codes_0.update();
+      codes_1.update();
     }, 100)
   }
 </script>

@@ -51,9 +51,10 @@
     "compile": function(codes) {
       var ret = [], codeType = this.codeType;
       var str, cmmnt, str_idx, cmmnt_idx, str_len, cmmnt_len, s_i, c_i, idx = 0;
-      while ((str = STRING_REG.exec(codes)) && (cmmnt = COMMENT_REG.exec(codes))){
+      while ((str = STRING_REG.exec(codes)), (cmmnt = COMMENT_REG.exec(codes)), str && cmmnt){
         strinfo(str[0]);
         cmmntinfo(cmmnt[0]);
+        // IF /*...*/ ... "XXX" || /*..."XXX"...*/
         if(cmmnt_idx < s_i || c_i < s_i && str_idx <= cmmnt_idx){
           buildKW(codes.slice(idx, c_i));
           buildComment(cmmnt[0]);
@@ -63,6 +64,19 @@
           buildString(str[0]);
           COMMENT_REG.lastIndex = idx = str_idx;
         }
+      }
+      if(str){
+        do{
+          strinfo(str[0]);
+          buildKW(codes.slice(idx, s_i));
+          buildString(str[0]);
+        }while(str = STRING_REG.exec(codes))
+      }else if(cmmnt){
+        do{
+          cmmntinfo(cmmnt[0]);
+          buildKW(codes.slice(idx, c_i));
+          buildComment(cmmnt[0]);
+        }while(cmmnt = COMMENT_REG.exec(codes))
       }
       ret.push(buildKW(codes.slice(idx)));
       // reset lastIndex for next compile
